@@ -2,6 +2,8 @@
  * Octave-Style Sales Playbook Type Definitions
  */
 
+import { ResearchData } from './gtm.types';
+
 export type PlaybookType = 'practitioner' | 'sector' | 'milestone' | 'competitive' | 'account';
 
 export interface PlaybookConfig {
@@ -56,15 +58,15 @@ export interface CoreMessage {
 }
 
 // Outreach Sequences
-export interface EmailTouch {
+export interface OctaveEmailTouch {
   subject: string;
   body: string;
 }
 
-export interface EmailSequence {
-  email_1_diagnosis: EmailTouch;
-  email_2_proof: EmailTouch;
-  email_3_direct_ask: EmailTouch;
+export interface OctaveEmailSequence {
+  email_1_diagnosis: OctaveEmailTouch;
+  email_2_proof: OctaveEmailTouch;
+  email_3_direct_ask: OctaveEmailTouch;
 }
 
 export interface LinkedInSequence {
@@ -81,7 +83,7 @@ export interface ColdCallFramework {
 }
 
 export interface OutreachSequences {
-  email_sequence: EmailSequence;
+  email_sequence: OctaveEmailSequence;
   linkedin_sequence: LinkedInSequence;
   cold_call_framework: ColdCallFramework;
 }
@@ -106,13 +108,4 @@ export interface OctavePlaybook {
     research_sources: string[];
     assumptions: string[];
   };
-}
-
-// Research Data (reused from existing)
-export interface ResearchData {
-  company_info: any;
-  competitive_landscape: any;
-  customer_intelligence: any;
-  market_trends: any;
-  raw_sources: string[];
 }
