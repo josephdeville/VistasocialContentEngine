@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GTM Context Engine</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .progress-bar {
+            transition: width 0.3s ease-in-out;
+        }
+        /* Markdown styles */
+        .markdown-content {
+            line-height: 1.6;
+        }
+        .markdown-content h1 {
+            font-size: 2em;
+            font-weight: bold;
+            margin: 1em 0 0.5em;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 0.3em;
+        }
+        .markdown-content h2 {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin: 1em 0 0.5em;
+        }
+        .markdown-content h3 {
+            font-size: 1.25em;
+            font-weight: bold;
+            margin: 0.8em 0 0.4em;
+        }
+        .markdown-content p { margin: 0.8em 0; }
+        .markdown-content ul, .markdown-content ol {
+            margin: 0.8em 0;
+            padding-left: 2em;
+        }
+        .markdown-content li { margin: 0.3em 0; }
+        .markdown-content code {
+            background: #f3f4f6;
+            padding: 0.2em 0.4em;
+            border-radius: 3px;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+        .markdown-content pre {
+            background: #1f2937;
+            color: #e5e7eb;
+            padding: 1em;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 1em 0;
+        }
+        .markdown-content pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+        .markdown-content table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 1em 0;
+        }
+        .markdown-content th, .markdown-content td {
+            border: 1px solid #e5e7eb;
+            padding: 0.5em;
+            text-align: left;
+        }
+        .markdown-content th {
+            background: #f3f4f6;
+            font-weight: bold;
+        }
+        .markdown-content blockquote {
+            border-left: 4px solid #667eea;
+            padding-left: 1em;
+            margin: 1em 0;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <div class="gradient-bg text-white py-6 shadow-lg">
+        <div class="container mx-auto px-4">
+            <h1 class="text-3xl font-bold">📖 GTM Context Engine</h1>
+            <p class="text-purple-100 mt-2">AI-Powered Go-To-Market Strategy & Sales Playbook Generator</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8">
+        <!-- Mode Selector -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8 fade-in">
+            <div class="flex gap-4 mb-6">
+                <button onclick="switchMode('analyze')" id="btn-analyze"
+                    class="flex-1 py-3 px-6 rounded-lg font-semibold transition duration-200 bg-purple-600 text-white shadow-md">
+                    📊 Strategic GTM Analysis
+                </button>
+                <button onclick="switchMode('playbook')" id="btn-playbook"
+                    class="flex-1 py-3 px-6 rounded-lg font-semibold transition duration-200 bg-gray-200 text-gray-700 hover:bg-gray-300">
+                    🎯 Octave Playbook
+                </button>
+            </div>
+
+            <!-- Analyze Form -->
+            <div id="form-analyze" class="fade-in">
+                <h2 class="text-2xl font-bold mb-4 text-gray-800">Strategic GTM Analysis</h2>
+                <p class="text-gray-600 mb-6">Generate a comprehensive 10-section GTM strategy playbook including ICP segments, buyer personas, use cases, competitive positioning, and implementation roadmap.</p>
+
+                <form onsubmit="submitAnalyze(event)">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-semibold mb-2 text-gray-700">Company Domain *</label>
+                            <input type="text" id="analyze-domain" required
+                                placeholder="stripe.com"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                            <p class="text-sm text-gray-500 mt-1">Enter the company domain to analyze</p>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold mb-2 text-gray-700">Industry Focus (Optional)</label>
+                            <input type="text" id="analyze-industry"
+                                placeholder="Healthcare, FinTech, Manufacturing..."
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold mb-2 text-gray-700">Competitor Focus (Optional)</label>
+                            <input type="text" id="analyze-competitor"
+                                placeholder="competitor.com"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold mb-2 text-gray-700">Output Format</label>
+                            <select id="analyze-format"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                <option value="markdown">Markdown</option>
+                                <option value="yaml">YAML</option>
+                                <option value="json">JSON</option>
+                            </select>
+                        </div>
+
+                        <button type="submit"
+                            class="w-full bg-purple-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-purple-700 transition duration-200 shadow-md">
+                            Generate GTM Playbook
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Playbook Form -->
+            <div id="form-playbook" class="hidden fade-in">
+                <h2 class="text-2xl font-bold mb-4 text-gray-800">Octave-Style Sales Playbook</h2>
+                <p class="text-gray-600 mb-6">Generate focused, tactical sales playbooks with named value props, qualifying questions, and ready-to-use outreach sequences.</p>
+
+                <form onsubmit="submitPlaybook(event)">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-semibold mb-2 text-gray-700">Company Domain *</label>
+                            <input type="text" id="playbook-domain" required
+                                placeholder="stripe.com"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold mb-2 text-gray-700">Playbook Type *</label>
+                            <select id="playbook-type" required
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                <option value="">Select a type...</option>
+                                <option value="practitioner">Practitioner - Target specific roles</option>
+                                <option value="sector">Sector - Target specific industries</option>
+                                <option value="milestone">Milestone - Target trigger events</option>
+                                <option value="competitive">Competitive - Displacement plays</option>
+                                <option value="account">Account - Named account plays</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold mb-2 text-gray-700">Target Focus *</label>
+                            <input type="text" id="playbook-focus" required
+                                placeholder="RevOps teams struggling with attribution"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                            <p class="text-sm text-gray-500 mt-1">Be specific: describe the role, problem, or situation</p>
+                        </div>
+
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                            <p class="text-sm font-semibold text-blue-800 mb-2">Example Targets by Type:</p>
+                            <ul class="text-sm text-blue-700 space-y-1">
+                                <li>• <strong>Practitioner:</strong> "CFOs managing subscription billing"</li>
+                                <li>• <strong>Sector:</strong> "Healthcare technology companies"</li>
+                                <li>• <strong>Milestone:</strong> "Companies that just raised Series B"</li>
+                                <li>• <strong>Competitive:</strong> "Displacing Monday.com in mid-market"</li>
+                                <li>• <strong>Account:</strong> "Zoom Video Communications"</li>
+                            </ul>
+                        </div>
+
+                        <button type="submit"
+                            class="w-full bg-purple-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-purple-700 transition duration-200 shadow-md">
+                            Generate Octave Playbook
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Progress Section -->
+        <div id="progress-section" class="hidden bg-white rounded-lg shadow-md p-6 mb-8 fade-in">
+            <h3 class="text-xl font-bold mb-4 text-gray-800">Generating Your Playbook...</h3>
+            <div class="bg-gray-200 rounded-full h-4 mb-3 overflow-hidden">
+                <div id="progress-bar" class="progress-bar bg-purple-600 h-full" style="width: 0%"></div>
+            </div>
+            <p id="progress-message" class="text-gray-600 text-center">Initializing...</p>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results-section" class="hidden bg-white rounded-lg shadow-md p-6 fade-in">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-800">✅ Your Playbook is Ready!</h3>
+                <button onclick="downloadPlaybook()"
+                    class="bg-green-600 text-white py-2 px-6 rounded-lg font-semibold hover:bg-green-700 transition duration-200 shadow-md">
+                    ⬇️ Download
+                </button>
+            </div>
+
+            <div id="results-content" class="markdown-content prose max-w-none">
+                <!-- Markdown content will be rendered here -->
+            </div>
+
+            <button onclick="resetForm()"
+                class="mt-6 w-full bg-purple-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-purple-700 transition duration-200">
+                Generate Another Playbook
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let currentJobId = null;
+        let currentMode = 'analyze';
+
+        function switchMode(mode) {
+            currentMode = mode;
+
+            // Update buttons
+            const btnAnalyze = document.getElementById('btn-analyze');
+            const btnPlaybook = document.getElementById('btn-playbook');
+
+            if (mode === 'analyze') {
+                btnAnalyze.className = 'flex-1 py-3 px-6 rounded-lg font-semibold transition duration-200 bg-purple-600 text-white shadow-md';
+                btnPlaybook.className = 'flex-1 py-3 px-6 rounded-lg font-semibold transition duration-200 bg-gray-200 text-gray-700 hover:bg-gray-300';
+                document.getElementById('form-analyze').classList.remove('hidden');
+                document.getElementById('form-playbook').classList.add('hidden');
+            } else {
+                btnPlaybook.className = 'flex-1 py-3 px-6 rounded-lg font-semibold transition duration-200 bg-purple-600 text-white shadow-md';
+                btnAnalyze.className = 'flex-1 py-3 px-6 rounded-lg font-semibold transition duration-200 bg-gray-200 text-gray-700 hover:bg-gray-300';
+                document.getElementById('form-playbook').classList.remove('hidden');
+                document.getElementById('form-analyze').classList.add('hidden');
+            }
+        }
+
+        async function submitAnalyze(event) {
+            event.preventDefault();
+
+            const domain = document.getElementById('analyze-domain').value;
+            const industry = document.getElementById('analyze-industry').value;
+            const competitor = document.getElementById('analyze-competitor').value;
+            const format = document.getElementById('analyze-format').value;
+
+            showProgress();
+
+            try {
+                const response = await fetch('/api/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ domain, industry, competitor, format })
+                });
+
+                const data = await response.json();
+                currentJobId = data.jobId;
+
+                // Start listening for progress
+                listenToProgress(data.jobId);
+            } catch (error) {
+                alert('Error: ' + error.message);
+                hideProgress();
+            }
+        }
+
+        async function submitPlaybook(event) {
+            event.preventDefault();
+
+            const domain = document.getElementById('playbook-domain').value;
+            const type = document.getElementById('playbook-type').value;
+            const focus = document.getElementById('playbook-focus').value;
+
+            showProgress();
+
+            try {
+                const response = await fetch('/api/playbook', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ domain, type, focus, format: 'markdown' })
+                });
+
+                const data = await response.json();
+                currentJobId = data.jobId;
+
+                // Start listening for progress
+                listenToProgress(data.jobId);
+            } catch (error) {
+                alert('Error: ' + error.message);
+                hideProgress();
+            }
+        }
+
+        function listenToProgress(jobId) {
+            const eventSource = new EventSource(`/api/progress/${jobId}`);
+
+            eventSource.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                updateProgress(data.progress, data.message);
+
+                if (data.progress >= 100) {
+                    eventSource.close();
+                    setTimeout(() => showResults(jobId), 500);
+                }
+            };
+
+            eventSource.onerror = () => {
+                eventSource.close();
+                checkResult(jobId);
+            };
+        }
+
+        async function checkResult(jobId) {
+            try {
+                const response = await fetch(`/api/result/${jobId}`);
+                const data = await response.json();
+
+                if (data.status === 'completed') {
+                    showResults(jobId);
+                } else if (data.status === 'failed') {
+                    alert('Generation failed: ' + data.error);
+                    hideProgress();
+                }
+            } catch (error) {
+                alert('Error checking result: ' + error.message);
+                hideProgress();
+            }
+        }
+
+        async function showResults(jobId) {
+            try {
+                const response = await fetch(`/api/result/${jobId}`);
+                const data = await response.json();
+
+                if (data.status === 'completed' && data.result) {
+                    const markdown = data.result.content;
+                    const html = marked.parse(markdown);
+
+                    document.getElementById('results-content').innerHTML = html;
+                    document.getElementById('progress-section').classList.add('hidden');
+                    document.getElementById('results-section').classList.remove('hidden');
+                }
+            } catch (error) {
+                alert('Error loading results: ' + error.message);
+                hideProgress();
+            }
+        }
+
+        function updateProgress(progress, message) {
+            document.getElementById('progress-bar').style.width = progress + '%';
+            document.getElementById('progress-message').textContent = message;
+        }
+
+        function showProgress() {
+            document.getElementById('progress-section').classList.remove('hidden');
+            document.getElementById('results-section').classList.add('hidden');
+            updateProgress(0, 'Starting...');
+        }
+
+        function hideProgress() {
+            document.getElementById('progress-section').classList.add('hidden');
+        }
+
+        async function downloadPlaybook() {
+            if (!currentJobId) return;
+
+            window.location.href = `/api/download/${currentJobId}`;
+        }
+
+        function resetForm() {
+            document.getElementById('results-section').classList.add('hidden');
+            currentJobId = null;
+
+            // Reset forms
+            document.getElementById('analyze-domain').value = '';
+            document.getElementById('analyze-industry').value = '';
+            document.getElementById('analyze-competitor').value = '';
+            document.getElementById('playbook-domain').value = '';
+            document.getElementById('playbook-type').value = '';
+            document.getElementById('playbook-focus').value = '';
+        }
+    </script>
+</body>
+</html>
